@@ -2,8 +2,10 @@ package com.victorasensio.andrevina
 
 import android.os.Bundle
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -29,6 +31,8 @@ class MainActivity : AppCompatActivity() {
 
         val button = findViewById<Button>(R.id.button)
         val inputText = findViewById<TextInputEditText>(R.id.inputText)
+        val textHistorial = findViewById<TextView>(R.id.textViewHistorial)
+        var numIntents = 0
 
         button.setOnClickListener {
             val userInput = inputText.text.toString()
@@ -43,12 +47,16 @@ class MainActivity : AppCompatActivity() {
                 userInput.toInt()
             } catch (e: NumberFormatException) {
                 Toast.makeText(this, "El valor introduït no és un número vàlid.", Toast.LENGTH_SHORT).show()
+                textHistorial.append("\nIntent no vàlid, el jugador s'ha tornat boig!!!")
+                inputText.setText("")
                 return@setOnClickListener
             }
 
             // Validar que esté entre 1 y 100
             if (userNumber !in 1..100) {
                 Toast.makeText(this, "Número fora de l'interval 1-100.", Toast.LENGTH_SHORT).show()
+                textHistorial.append("\nIntent no vàlid, el jugador s'ha tornat boig!!!")
+                inputText.setText("")
                 return@setOnClickListener
             }
 
@@ -56,16 +64,40 @@ class MainActivity : AppCompatActivity() {
             when {
                 userNumber == randomNumber -> {
                     Toast.makeText(this, "Has encertat el número! 🎉", Toast.LENGTH_LONG).show()
+
                     // Generar otro número para un nuevo juego
                     randomNumber = Random.nextInt(1, 101)
+
+                    textHistorial.append("\nIntent número $numIntents: el número $userNumber és el correcte")
+
+                    val builder = AlertDialog.Builder(this)
+                    builder
+                        .setTitle("Has guanyat la partida amb $numIntents intents.")
+                        .setMessage("Andrevina joc")
+                        .setPositiveButton("Accept") { dialog, which ->
+                            // Acción cuando el usuario acepta
+                        }
+                        .setNegativeButton("Deny") { dialog, which ->
+                            // Acción cuando el usuario niega
+                        }
+
+                    val dialog = builder.create()
+                    dialog.show()
+
+                    numIntents = 0;
                 }
                 userNumber < randomNumber -> {
                     Toast.makeText(this, "El número és massa baix.", Toast.LENGTH_SHORT).show()
+                    numIntents += 1
+                    textHistorial.append("\nIntent número $numIntents: número més alt que $userNumber")
                 }
                 else -> {
                     Toast.makeText(this, "El número és massa alt.", Toast.LENGTH_SHORT).show()
+                    numIntents += 1
+                    textHistorial.append("\nIntent número $numIntents: número més baix que $userNumber")
                 }
             }
+            inputText.setText("");
         }
     }
 }
