@@ -1,5 +1,6 @@
 package com.victorasensio.andrevina
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
@@ -9,12 +10,14 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.FragmentManager
 import com.google.android.material.textfield.TextInputEditText
 import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
 
     private var randomNumber = 0
+    companion object val recordsArray = ArrayList<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,9 +32,11 @@ class MainActivity : AppCompatActivity() {
         // Generar número aleatorio entre 1 y 100
         randomNumber = Random.nextInt(1, 101)
 
+
         val button = findViewById<Button>(R.id.button)
         val inputText = findViewById<TextInputEditText>(R.id.inputText)
         val textHistorial = findViewById<TextView>(R.id.textViewHistorial)
+        val button2 = findViewById<Button>(R.id.button2)
         var numIntents = 0
 
         button.setOnClickListener {
@@ -70,21 +75,26 @@ class MainActivity : AppCompatActivity() {
 
                     textHistorial.append("\nIntent número $numIntents: el número $userNumber és el correcte")
 
-                    val builder = AlertDialog.Builder(this)
-                    builder
-                        .setTitle("Has guanyat la partida amb $numIntents intents.")
-                        .setMessage("Andrevina joc")
-                        .setPositiveButton("Accept") { dialog, which ->
+                    //Cambiarlo por un dialog
+                    //val builder = AlertDialog.Builder(this)
+                    //builder
+                    //    .setTitle("Has guanyat la partida amb $numIntents intents.")
+                    //    .setMessage("Andrevina joc")
+                    //    .setPositiveButton("Accept") { dialog, which ->
                             // Acción cuando el usuario acepta
-                        }
-                        .setNegativeButton("Deny") { dialog, which ->
+                    //    }
+                    //    .setNegativeButton("Deny") { dialog, which ->
                             // Acción cuando el usuario niega
-                        }
+                    //    }
 
-                    val dialog = builder.create()
-                    dialog.show()
+                    //val dialog = builder.create()
+                    //dialog.show()
 
-                    numIntents = 0;
+                    val dialog = RecordsDialog()
+                    dialog.show(supportFragmentManager, "RecordsDialog")
+
+
+                    numIntents = 0; //número intents reiniciat
                 }
                 userNumber < randomNumber -> {
                     Toast.makeText(this, "El número és massa baix.", Toast.LENGTH_SHORT).show()
@@ -99,5 +109,20 @@ class MainActivity : AppCompatActivity() {
             }
             inputText.setText("");
         }
+
+        button2.setOnClickListener {
+
+            val intent = Intent(this, HallOfFame::class.java)
+            intent.putStringArrayListExtra("lista-records", recordsArray)
+            startActivity(intent)
+        }
     }
+}
+
+private fun AlertDialog.show(
+    supportFragmentManager: FragmentManager,
+    string: String
+) {
+    TODO("Not yet implemented")
+
 }
