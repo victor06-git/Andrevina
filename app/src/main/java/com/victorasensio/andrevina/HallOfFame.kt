@@ -24,7 +24,9 @@ class HallOfFame : AppCompatActivity() {
         val records = intent.getStringArrayListExtra("lista-records")
         val textView = findViewById<TextView>(R.id.textView3)
 
-
+        for (record in MainActivity.recordsArray) {
+            textView.setText(record)
+        }
 
         button.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)

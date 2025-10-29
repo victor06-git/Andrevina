@@ -16,10 +16,12 @@ import kotlin.random.Random
 import android.content.Context
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), RecordsDialog.RecordsDialogListener {
 
     private var randomNumber = 0
-    companion object val recordsArray = ArrayList<String>()
+    companion object {
+        val recordsArray = ArrayList<String>()
+    }
 
     override fun onRecordAccepted(name: String, attempts: Int) {
         val record = "Jugador: $name, Intentos: $attempts"
@@ -87,7 +89,7 @@ class MainActivity : AppCompatActivity() {
                     if (numIntents == 1) {textHistorial.append("\nJoc número $numJoc")}
                     textHistorial.append("\nIntent número $numIntents: el número $userNumber és el correcte")
 
-                    val dialog = RecordsDialog()
+                    val dialog = RecordsDialog.newInstance(numIntents)
                     dialog.show(supportFragmentManager, "RecordsDialog")
 
                     numIntents = 0 //número intents reiniciat
@@ -119,10 +121,4 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-private fun AlertDialog.show(
-    supportFragmentManager: FragmentManager,
-    string: String
-) {
-    TODO("Not yet implemented")
 
-}

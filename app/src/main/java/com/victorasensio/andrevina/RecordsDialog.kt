@@ -1,18 +1,39 @@
 package com.victorasensio.andrevina
 
 import android.app.Dialog
+import android.content.Context
 import android.os.Bundle
+import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
-import android.content.Context
 
 class RecordsDialog : DialogFragment() {
 
-    interface RecordsDialogListenes {
+    interface RecordsDialogListener {
         fun onRecordAccepted(name: String, attempts: Int)
     }
 
     private var listener: RecordsDialogListener? = null
+    private var attempts: Int = 0
+
+    companion object {
+        private const val ARG_ATTEMPTS = "attempts"
+
+        fun newInstance(attempts: Int): RecordsDialog {
+            val fragment = RecordsDialog()
+            val args = Bundle()
+            args.putInt(ARG_ATTEMPTS, attempts)
+            fragment.arguments = args
+            return fragment
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            attempts = it.getInt(ARG_ATTEMPTS, 0)
+        }
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -28,20 +49,27 @@ class RecordsDialog : DialogFragment() {
         val inflater = requireActivity().layoutInflater
         val view = inflater.inflate(R.layout.dialog, null)
 
-        // Asumiendo que en el layout 'dialog' tienes un EditText para nombre con id editTextName y otro para intentos con id editTextAttempts
-        val editTextName = view.findViewById<EditText>(R.id.editTextName)
-        val editTextAttempts = view.findViewById<EditText>(R.id.editTextAttempts)
+        val editTextName = view.findViewById<EditText>(R.id.username)
 
         builder.setView(view)
             .setTitle("Guardar Record")
-            .setMessage("Vols guardar el teu record?")
-            .setPositiveButton("Accept") { dialog, _ ->
-                val name = editTextName.text.toString()
-                val attempts = editTextAttempts.text.toString().toIntOrNull() ?: 0
-                listener?.onRecordAccepted(name, attempts)
+            .setMessage("Has encertat en $attempts intents! Vols guardar el teu record?")
+            .setPositiveButton("Acceptar") { dialog, _ ->
+                val name = editTextName.text.toString().trim()
+                if (name.isNotEmpty()) {
+                    listener?.onRecordAccepted(name, attempts)
+                }
+                dialog.dismiss()
             }
-            .setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
+            .setNegativeButton("Cancel·lar") { dialog, _ ->
+                dialog.cancel()
+            }
 
         return builder.create()
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        listener = null
     }
 }
